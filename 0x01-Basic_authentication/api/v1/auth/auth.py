@@ -12,10 +12,19 @@ class Auth:
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
-        checks if a path requires authentication and returns True or False
+        returns True if the path is not in the list of strings excluded_paths
         """
 
-        return False
+        if path is None:
+            return True
+
+        """ ensure path ends with a '/' """
+        norm_path = path if path.endswith('/') else path + '/'
+
+        if not excluded_paths:
+            return True
+
+        return norm_path not in excluded_paths
 
     def authorization_header(self, request=None) -> str:
         """
@@ -24,7 +33,7 @@ class Auth:
 
         return None
 
-    def current_user(self, request=None) -> TypeVar('User'):
+    def current_user(self, request=None) -> TypeVar('User'):  # type: ignore
         """
         checks the current user of a flask request
         """
