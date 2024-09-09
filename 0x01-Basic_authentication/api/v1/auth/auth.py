@@ -28,10 +28,16 @@ class Auth:
 
     def authorization_header(self, request=None) -> str:
         """
-        checks if a flask request has an authorization header
+        checks whether a flask request has an authorization header key
         """
 
-        return None
+        if request is None:
+            return None
+        
+        #if 'Authorization' in request:
+            #return None
+        
+        return request.headers.get('Authorization', None)
 
     def current_user(self, request=None) -> TypeVar('User'):  # type: ignore
         """
