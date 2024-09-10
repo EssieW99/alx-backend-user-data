@@ -19,10 +19,15 @@ class Auth:
             return True
 
         """ ensure path ends with a '/' """
-        norm_path = path if path.endswith('/') else path + '/'
+        norm_path = path if path.endswith(('/', '*')) else path + '/'
 
         if not excluded_paths:
             return True
+
+        for excluded_path in excluded_paths:
+            if excluded_path.endswith('*'):
+                if norm_path.startswith(excluded_path[:-1]):
+                    return False
 
         return norm_path not in excluded_paths
 
