@@ -60,7 +60,7 @@ def check_authorization():
 
     exception_list = ['/api/v1/status/',
                       '/api/v1/unauthorized/', '/api/v1/forbidden/',
-                      '/api/v1/stat*']
+                      '/api/v1/stat*', '/api/v1/auth_session/login/']
 
     if request.path in exception_list:
         return
@@ -69,7 +69,8 @@ def check_authorization():
     if auth.require_auth(request.path, exception_list):
 
         """ checks for the authorization header"""
-        if auth.authorization_header(request) is None:
+        auth_header = auth.authorization_header(request)
+        if auth_header is None and auth.session_cookie(request) is None:
             abort(401)
 
         """ checks if the current user is authorized"""
