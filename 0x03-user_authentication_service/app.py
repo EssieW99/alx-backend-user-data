@@ -28,7 +28,7 @@ def register_user():
     password = request.form.get('password')
     try:
         AUTH.register_user(email=email, password=password)
-        return jsonify({f'"email": email, "message": "user created"'}), 200
+        return jsonify({"email": email, "message": "user created"})
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
 
