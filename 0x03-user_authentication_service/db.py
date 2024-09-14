@@ -54,14 +54,29 @@ class DB:
 
         session = self._session
 
-        required_key = {'email'}
-        wrong_keys = required_key - set(kwargs.keys())
-        if wrong_keys:
-            raise InvalidRequestError()
+        try:
 
-        user = session.query(User).filter_by(**kwargs).first()
+            user = session.query(User).filter_by(**kwargs).first()
+            return user
+        except NoResultFound:
+            raise NoResultFound("User not found")
+        except InvalidRequestError:
+            raise InvalidRequestError("Invalid")
 
-        if not user:
-            raise NoResultFound("No user found")
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+        locates a user then updates the user's attributes
+        as passed in the method's arguments
+        """
 
-        return user
+        session = self._session
+        user = self.find_user_by(id=user_id)
+
+        for key, value in kwargs.items():
+            if not hasattr(user, key):
+                raise ValueError("Error")
+
+            setattr(user, key, value)
+
+        session.commit()
+        return None
