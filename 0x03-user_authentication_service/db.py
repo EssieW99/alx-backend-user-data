@@ -47,7 +47,7 @@ class DB:
 
         return new_user
 
-    def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """
         finds a user by the use of arbitrary keyword arguments
         """
