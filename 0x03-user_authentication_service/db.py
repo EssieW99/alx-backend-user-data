@@ -7,8 +7,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import User
-
 from user import Base
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError
+from typing import Dict, Any
 
 
 class DB:
@@ -39,7 +41,27 @@ class DB:
 
         new_user = User(email=email, hashed_password=hashed_password)
 
-        self._session.add(new_user)
-        self._session.commit()
+        session = self._session
+        session.add(new_user)
+        session.commit()
 
         return new_user
+
+    def find_user_by(self, **kwargs: Dict[str, Any]) -> User:
+        """
+        finds a user by the use of arbitrary keyword arguments
+        """
+
+        session = self._session
+
+        required_key = {'email'}
+        wrong_keys = required_key - set(kwargs.keys())
+        if wrong_keys:
+            raise InvalidRequestError()
+
+        user = session.query(User).filter_by(**kwargs).first()
+
+        if not user:
+            raise NoResultFound("No user found")
+
+        return user
