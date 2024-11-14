@@ -2,7 +2,7 @@
 """ session authentication"""
 
 from api.v1.views import app_views
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, abort
 from models.user import User
 from models.base import Base
 from api.v1.auth.session_auth import SessionAuth
@@ -13,9 +13,9 @@ app = Flask(__name__)
 
 
 @app_views.route('/auth_session/login', methods=['POST'], strict_slashes=False)
-def session_auth():
+def login():
     """
-    authentication based on a Session ID stored in a cookie
+    logging in authentication based on a Session ID stored in a cookie
     """
 
     email = request.form.get('email')
@@ -49,3 +49,19 @@ def session_auth():
     response = make_response(jsonify(user_data))
     response.set_cookie(session_name, session_id)
     return response
+
+
+@app_views.route('/auth_session/logout',
+                 methods=['DELETE'], strict_slashes=False)
+def logout():
+    """
+    logouts a user by deleting the Session ID.
+    """
+
+    from api.v1.app import auth
+    log_out = auth.destroy_session(request)
+
+    if log_out is False:
+        abort(404)
+
+    return jsonify({}), 200
