@@ -114,7 +114,7 @@ class Auth:
         if user_id is None:
             return None
         try:
-            db.update_user(user_id, session_id=None)
+            db.update_user(user_id=user_id, session_id=None)
             return None
         except (NoResultFound, ValueError):
             return None
