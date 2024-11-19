@@ -48,7 +48,7 @@ class DB:
 
         return new_user
 
-    def find_user_by(self, **kwargs: Any) -> User:
+    def find_user_by(self, **kwargs) -> User:
         """
         finds a user by the use of arbitrary keyword arguments
         """
@@ -64,7 +64,7 @@ class DB:
         except InvalidRequestError:
             raise InvalidRequestError("Invalid")
 
-    def update_user(self, user_id: int, **kwargs: Any) -> None:
+    def update_user(self, user_id: int, **kwargs) -> None:
         """
         locates a user then updates the user's attributes
         as passed in the method's arguments
