@@ -4,16 +4,35 @@
 from user import User
 from db import DB
 import bcrypt
+import uuid
 
 
 def _hash_password(password: str) -> bytes:
     """
-    salt hashes the inputed password with bcrypt.hashpw
+    takes in a password string arguments and returns bytes.
+    The returned bytes is a salted hash of the input password
     """
 
-    hashed_pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    """ convert password to array of bytes"""
+    bytes = password.encode('utf-8')
 
-    return hashed_pwd
+    """ generate the salt"""
+    salt = bcrypt.gensalt()
+
+    """ hashing the password"""
+    hashed_passwd = bcrypt.hashpw(bytes, salt)
+
+    return hashed_passwd
+
+
+def _generate_uuid() -> str:
+    """
+    return a string representation of a new UUID
+    """
+
+    id = str(uuid.uuid4())
+
+    return id
 
 
 class Auth:
@@ -36,3 +55,39 @@ class Auth:
 
         hashed_password = _hash_password(password)
         db.add_user(email, hashed_password)
+
+    def valid_login(self, email: str, password: str) -> bool:
+        """
+        credential validation
+        """
+
+        db = self._db
+        user = db.find_user_by(email=email)
+
+        if user:
+            try:
+                passwd = password.encode('utf-8')
+                return bcrypt.checkpw(passwd, user.hashed_password)
+
+            except Exception:
+                return False
+        else:
+            return False
+
+    def create_session(self, email: str) -> str:
+        """
+        find the user corresponding to the email, generate a new UUID and
+        store it in the database as the user’s session_id,
+        then return the session ID
+        """
+
+        db = self._db
+
+        user = db.find_user_by(email=email)
+
+        if user:
+            session_id = _generate_uuid()
+            db.update_user(user.id, session_id=session_id)
+            return session_id
+        else:
+            return None
