@@ -63,16 +63,13 @@ class Auth:
         """
 
         db = self._db
-        user = db.find_user_by(email=email)
 
-        if user:
-            try:
-                passwd = password.encode('utf-8')
-                return bcrypt.checkpw(passwd, user.hashed_password)
+        try:
+            user = db.find_user_by(email=email)
+            passwd = password.encode('utf-8')
+            return bcrypt.checkpw(passwd, user.hashed_password)
 
-            except Exception:
-                return False
-        else:
+        except NoResultFound:
             return False
 
     def create_session(self, email: str) -> str:
@@ -84,12 +81,14 @@ class Auth:
 
         db = self._db
 
-        user = db.find_user_by(email=email)
+        try:
 
-        if user:
+            user = db.find_user_by(email=email)
             session_id = _generate_uuid()
             db.update_user(user.id, session_id=session_id)
             return session_id
+        except NoResultFound:
+            return None
 
     def get_user_from_session_id(self, session_id: str) -> User:
         """
