@@ -111,7 +111,10 @@ class Auth:
         """
         db = self._db
 
+        if user_id is None:
+            return None
         try:
             db.update_user(user_id, session_id=None)
-        except NoResultFound:
-            raise
+            return None
+        except (NoResultFound, ValueError):
+            return None
