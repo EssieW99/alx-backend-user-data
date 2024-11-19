@@ -111,8 +111,7 @@ class Auth:
         """
         db = self._db
 
-        user = db.find_user_by(id=user_id)
-
-        if user:
+        try:
             db.update_user(user_id, session_id=None)
-            return None
+        except NoResultFound:
+            raise
